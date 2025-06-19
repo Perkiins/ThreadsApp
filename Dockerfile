@@ -1,38 +1,31 @@
 FROM python:3.11-slim
 
-# Instalar dependencias del sistema necesarias para Playwright y navegador
+# Instala dependencias necesarias para Selenium + Chrome
 RUN apt-get update && apt-get install -y \
-    libx11-xcb1 \
-    libxcb1 \
-    libxcomposite1 \
-    libxcursor1 \
-    libxdamage1 \
-    libxrandr2 \
-    libgbm1 \
-    libpango1.0-0 \
-    libasound2 \
-    libatk1.0-0 \
-    libcups2 \
-    libnss3 \
-    libxss1 \
-    libgtk-3-0 \
-    libxshmfence1 \
-    wget \
+    wget unzip curl gnupg \
+    fonts-liberation libasound2 libatk-bridge2.0-0 \
+    libatk1.0-0 libcups2 libdbus-1-3 libgdk-pixbuf2.0-0 \
+    libnspr4 libnss3 libx11-xcb1 libxcomposite1 libxdamage1 \
+    libxrandr2 libgbm1 libxshmfence1 libxss1 libgtk-3-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Crear carpeta para la app
+# Instalar Chrome
+RUN curl -sSL https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && \
+    apt-get update && apt-get install -y google-chrome-stable
+
+# Crear carpeta app
 WORKDIR /app
 
-# Copiar requirements.txt y instalar dependencias Python
+# Copiar e instalar dependencias Python
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-RUN python -m playwright install
 
-# Copiar el código de la app
+# Copiar archivos de la app
 COPY . .
 
-# Exponer puerto
+# Exponer puerto para Flask
 EXPOSE 8000
 
-# Comando para ejecutar FastAPI con Uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Ejecutar la app Flask
+CMD ["python", "app.py"]
