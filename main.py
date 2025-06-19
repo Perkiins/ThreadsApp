@@ -21,3 +21,7 @@ async def scrape(url: str = Query(..., description="URL a scrapear")):
         title = await page.title()
         await browser.close()
     return {"title": title}
+
+@app.get("/")
+async def root():
+    return {"message": "API funcionando correctamente"}
