@@ -26,6 +26,7 @@ WORKDIR /app
 # Copiar requirements.txt y instalar dependencias Python
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+RUN playwright install
 
 # Copiar el código de la app
 COPY . .
